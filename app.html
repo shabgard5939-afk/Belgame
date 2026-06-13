@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حال امروز</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --sky: #1a1a2e;
+    --mid: #16213e;
+    --card: #0f3460;
+    --accent: #e94560;
+    --gold: #f5a623;
+    --text: #eaeaea;
+    --muted: #8899aa;
+  }
+
+  body {
+    font-family: 'Vazirmatn', sans-serif;
+    background: var(--sky);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px;
+    overflow-x: hidden;
+  }
+
+  /* Stars background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, white 0%, transparent 100%),
+      radial-gradient(1px 1px at 60% 15%, white 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 50%, white 0%, transparent 100%),
+      radial-gradient(1px 1px at 40% 70%, white 0%, transparent 100%),
+      radial-gradient(1px 1px at 10% 80%, white 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 20%, white 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 85%, white 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 55%, white 0%, transparent 100%);
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 420px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .app-name {
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 4px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .greeting {
+    font-size: 32px;
+    font-weight: 900;
+    line-height: 1.2;
+  }
+
+  .greeting span {
+    color: var(--accent);
+  }
+
+  /* Clock */
+  .clock-card {
+    background: linear-gradient(135deg, #0f3460, #16213e);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 24px;
+    padding: 28px;
+    text-align: center;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  .time {
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1;
+    background: linear-gradient(135deg, #fff, var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .date-persian {
+    font-size: 15px;
+    color: var(--muted);
+    margin-top: 8px;
+    font-weight: 300;
+  }
+
+  /* Mood */
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    margin-top: 24px;
+    text-transform: uppercase;
+  }
+
+  .mood-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .mood-btn {
+    background: var(--mid);
+    border: 2px solid transparent;
+    border-radius: 16px;
+    padding: 14px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .mood-btn:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .mood-btn.active {
+    border-color: var(--accent);
+    background: rgba(233, 69, 96, 0.15);
+  }
+
+  .mood-emoji { font-size: 26px; }
+  .mood-label { font-size: 11px; color: var(--muted); font-family: 'Vazirmatn', sans-serif; }
+
+  /* Note */
+  .note-box {
+    background: var(--mid);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .note-box textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 15px;
+    resize: none;
+    line-height: 1.7;
+    direction: rtl;
+  }
+
+  .note-box textarea::placeholder { color: var(--muted); }
+
+  /* Save button */
+  .save-btn {
+    width: 100%;
+    background: var(--accent);
+    border: none;
+    border-radius: 16px;
+    padding: 16px;
+    color: white;
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 20px;
+  }
+
+  .save-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .save-btn:active { transform: translateY(0); }
+
+  /* Saved notes */
+  .saved-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .saved-item {
+    background: var(--mid);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 14px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .saved-emoji { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+
+  .saved-content { flex: 1; }
+  .saved-time { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .saved-text { font-size: 14px; line-height: 1.6; }
+
+  .empty-state {
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    padding: 24px;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--gold);
+    color: #1a1a2e;
+    padding: 12px 24px;
+    border-radius: 100px;
+    font-weight: 700;
+    font-size: 14px;
+    font-family: 'Vazirmatn', sans-serif;
+    transition: transform 0.3s ease;
+    z-index: 999;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="app-name">hal · امروز</div>
+    <div class="greeting">حالت چطوره؟ <span>✦</span></div>
+  </div>
+
+  <!-- Clock -->
+  <div class="clock-card">
+    <div class="time" id="clock">--:--</div>
+    <div class="date-persian" id="dateLabel"></div>
+  </div>
+
+  <!-- Mood -->
+  <div class="section-label">حالت امروز رو انتخاب کن</div>
+  <div class="mood-grid">
+    <button class="mood-btn" data-mood="😊" data-label="خوشحال" onclick="selectMood(this)">
+      <span class="mood-emoji">😊</span>
+      <span class="mood-label">خوشحال</span>
+    </button>
+    <button class="mood-btn" data-mood="😔" data-label="غمگین" onclick="selectMood(this)">
+      <span class="mood-emoji">😔</span>
+      <span class="mood-label">غمگین</span>
+    </button>
+    <button class="mood-btn" data-mood="😤" data-label="عصبانی" onclick="selectMood(this)">
+      <span class="mood-emoji">😤</span>
+      <span class="mood-label">عصبانی</span>
+    </button>
+    <button class="mood-btn" data-mood="😴" data-label="خسته" onclick="selectMood(this)">
+      <span class="mood-emoji">😴</span>
+      <span class="mood-label">خسته</span>
+    </button>
+    <button class="mood-btn" data-mood="🤩" data-label="هیجانی" onclick="selectMood(this)">
+      <span class="mood-emoji">🤩</span>
+      <span class="mood-label">هیجانی</span>
+    </button>
+    <button class="mood-btn" data-mood="😰" data-label="نگران" onclick="selectMood(this)">
+      <span class="mood-emoji">😰</span>
+      <span class="mood-label">نگران</span>
+    </button>
+    <button class="mood-btn" data-mood="🥰" data-label="عاشقانه" onclick="selectMood(this)">
+      <span class="mood-emoji">🥰</span>
+      <span class="mood-label">عاشقانه</span>
+    </button>
+    <button class="mood-btn" data-mood="😐" data-label="عادی" onclick="selectMood(this)">
+      <span class="mood-emoji">😐</span>
+      <span class="mood-label">عادی</span>
+    </button>
+  </div>
+
+  <!-- Note -->
+  <div class="section-label">یه چیزی بنویس (اختیاری)</div>
+  <div class="note-box">
+    <textarea id="noteInput" rows="3" placeholder="امروز چی شد؟ هر چیزی که دلت میخواد..."></textarea>
+  </div>
+
+  <button class="save-btn" onclick="saveEntry()">ذخیره کن ✓</button>
+
+  <!-- History -->
+  <div class="section-label">یادداشت‌های قبلی</div>
+  <div class="saved-list" id="savedList">
+    <div class="empty-state">هنوز چیزی ثبت نشده 🌙</div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast">ذخیره شد! 🌟</div>
+
+<script>
+  let selectedMood = null;
+  let entries = JSON.parse(localStorage.getItem('hal_entries') || '[]');
+
+  // Clock
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2,'0');
+    const m = String(now.getMinutes()).padStart(2,'0');
+    document.getElementById('clock').textContent = h + ':' + m;
+
+    const days = ['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنجشنبه','جمعه','شنبه'];
+    const months = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+
+    // Simple Persian date (approximate)
+    const jd = gregorianToJalali(now.getFullYear(), now.getMonth()+1, now.getDate());
+    document.getElementById('dateLabel').textContent =
+      days[now.getDay()] + ' · ' + jd[2] + ' ' + months[jd[1]-1] + ' ' + jd[0];
+  }
+
+  function gregorianToJalali(gy, gm, gd) {
+    const g_d_m = [0,31,59,90,120,151,181,212,243,273,304,334];
+    let jy = (gy <= 1600) ? 0 : 979;
+    gy -= (gy <= 1600) ? 621 : 1600;
+    const gy2 = (gm > 2) ? gy + 1 : gy;
+    let days = (365 * gy) + Math.floor((gy2 + 3) / 4) - Math.floor((gy2 + 99) / 100)
+             + Math.floor((gy2 + 399) / 400) - 80 + gd + g_d_m[gm - 1];
+    jy += 33 * Math.floor(days / 12053);
+    days %= 12053;
+    jy += 4 * Math.floor(days / 1461);
+    days %= 1461;
+    if (days > 365) { jy += Math.floor((days - 1) / 365); days = (days - 1) % 365; }
+    const jm = (days < 186) ? 1 + Math.floor(days / 31) : 7 + Math.floor((days - 186) / 30);
+    const jd2 = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30));
+    return [jy, jm, jd2];
+  }
+
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  function selectMood(btn) {
+    document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedMood = { emoji: btn.dataset.mood, label: btn.dataset.label };
+  }
+
+  function saveEntry() {
+    const note = document.getElementById('noteInput').value.trim();
+    if (!selectedMood && !note) {
+      showToast('یه حال یا یادداشت انتخاب کن 😊');
+      return;
+    }
+    const now = new Date();
+    const entry = {
+      emoji: selectedMood ? selectedMood.emoji : '📝',
+      label: selectedMood ? selectedMood.label : '',
+      note: note,
+      time: now.toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit'})
+    };
+    entries.unshift(entry);
+    localStorage.setItem('hal_entries', JSON.stringify(entries.slice(0, 20)));
+    document.getElementById('noteInput').value = '';
+    document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+    selectedMood = null;
+    renderList();
+    showToast('ذخیره شد! 🌟');
+  }
+
+  function renderList() {
+    const list = document.getElementById('savedList');
+    if (entries.length === 0) {
+      list.innerHTML = '<div class="empty-state">هنوز چیزی ثبت نشده 🌙</div>';
+      return;
+    }
+    list.innerHTML = entries.map(e => `
+      <div class="saved-item">
+        <div class="saved-emoji">${e.emoji}</div>
+        <div class="saved-content">
+          <div class="saved-time">${e.time}${e.label ? ' · ' + e.label : ''}</div>
+          ${e.note ? `<div class="saved-text">${e.note}</div>` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  renderList();
+</script>
+</body>
+</html>
